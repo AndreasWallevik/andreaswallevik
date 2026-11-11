@@ -66,7 +66,7 @@ Edit the body of `src/content/pages/about.md` for the biography. Site-wide name,
 
 The workflow in `.github/workflows/deploy.yml` builds and deploys on each push to `main`. Commit `package-lock.json` with any dependency changes. In the GitHub repository settings, set **Pages → Build and deployment → Source** to **GitHub Actions**. The workflow automatically uses `https://OWNER.github.io/REPOSITORY/` for a normal project site, including the correct asset base path. Do not push to `main` until publishing is approved.
 
-For a custom domain, set the GitHub Pages domain in repository settings, then add the domain to `public/CNAME`. Set repository Actions variables `SITE_URL` to `https://your-domain.example` and `BASE_PATH` to `/`. Confirm DNS with your domain provider before using it. For a user or organization root site (`OWNER.github.io`), set `SITE_URL` to that URL and `BASE_PATH` to `/`.
+For a custom domain, set the domain in GitHub Pages repository settings, then set repository Actions variables `SITE_URL` to `https://your-domain.example` and `BASE_PATH` to `/`. GitHub ignores `CNAME` files when publishing through this custom Actions workflow. Configure DNS only after the domain is added in GitHub. For a user or organization root site (`OWNER.github.io`), set `SITE_URL` to that URL and `BASE_PATH` to `/`.
 
 For a local build with a non-default URL, set `SITE_URL` and `BASE_PATH` in your shell before running `npm run build`. The default `https://example.com` is a development placeholder for canonical and sitemap URLs.
 
