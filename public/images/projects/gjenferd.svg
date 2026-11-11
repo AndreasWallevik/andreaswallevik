@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-label="Abstract nocturnal landscape">
+  <rect width="1200" height="900" fill="#1e2625"/>
+  <circle cx="633" cy="344" r="180" fill="#d2c9aa"/>
+  <path d="M0 462c130-16 220-47 363-35 170 14 269 56 442 36 159-18 257-66 395-24v461H0Z" fill="#6d786d"/>
+  <path d="M0 577c149-40 286-25 426 8 180 43 337-41 516-34 113 4 178 31 258 48v301H0Z" fill="#3a4c49"/>
+  <path d="M0 720c204-29 321-12 482 26 174 40 285-16 420-22 124-6 229 24 298 31v145H0Z" fill="#253634"/>
+  <path d="M468 820c103-26 203-25 309 0" fill="none" stroke="#b0b09b" stroke-width="3" opacity=".6"/>
+</svg>

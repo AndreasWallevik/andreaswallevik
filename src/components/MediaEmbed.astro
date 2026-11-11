@@ -1,0 +1,61 @@
+---
+import type { ImageMetadata } from 'astro';
+import ProjectImage from './ProjectImage.astro';
+interface Props {
+  provider: 'youtube' | 'vimeo' | 'spotify' | 'soundcloud';
+  id: string;
+  label: string;
+  poster?: string | ImageMetadata;
+  watchUrl?: string;
+  embed?: boolean;
+}
+const { provider, id, label, poster, watchUrl, embed = true } = Astro.props;
+const providerLabel = { youtube: 'YouTube', vimeo: 'Vimeo', spotify: 'Spotify', soundcloud: 'SoundCloud' }[provider];
+const actionLabel = provider === 'youtube' || provider === 'vimeo' ? 'Watch' : 'Listen';
+const urls = {
+  youtube: `https://www.youtube.com/embed/${encodeURIComponent(id)}?autoplay=1`,
+  vimeo: `https://player.vimeo.com/video/${encodeURIComponent(id)}?autoplay=1`,
+  spotify: `https://open.spotify.com/embed/${id.split('/').map(encodeURIComponent).join('/')}`,
+  soundcloud: `https://w.soundcloud.com/player/?url=${encodeURIComponent(`https://api.soundcloud.com/tracks/${id}`)}`,
+};
+---
+<div class="media-embed-wrap">
+  <div class="media-embed" data-embed-url={embed ? urls[provider] : undefined}>
+    {embed
+      ? <button class:list={['embed-trigger', { 'has-poster': Boolean(poster) }]} type="button" aria-label={`${actionLabel} ${label} on ${providerLabel}`}>
+          <span class="embed-placeholder" aria-hidden="true">{provider}</span>
+          {poster && <ProjectImage src={poster} alt="" loading="lazy" />}
+          <span class="embed-play" aria-hidden="true">▶</span>
+          <span class="embed-label">{actionLabel} on {providerLabel}</span>
+        </button>
+      : <a class:list={['embed-trigger', { 'has-poster': Boolean(poster) }]} href={watchUrl} target="_blank" rel="noopener noreferrer" aria-label={`${actionLabel} ${label} on ${providerLabel} (opens in a new tab)`}>
+          <span class="embed-placeholder" aria-hidden="true">{provider}</span>
+          {poster && <ProjectImage src={poster} alt="" loading="lazy" />}
+          <span class="embed-play" aria-hidden="true">↗</span>
+          <span class="embed-label">{actionLabel} on {providerLabel}</span>
+        </a>}
+  </div>
+  {watchUrl && embed && <a class="media-watch-link" href={watchUrl} target="_blank" rel="noopener noreferrer">Watch on {providerLabel} <span aria-hidden="true">↗</span></a>}
+</div>
+<script>
+  document.querySelectorAll<HTMLElement>('.media-embed').forEach((container) => {
+    const button = container.querySelector('button');
+    const poster = container.querySelector('img');
+    if (button && poster) {
+      const showFallback = () => { poster.remove(); button.classList.remove('has-poster'); };
+      poster.addEventListener('error', showFallback, { once: true });
+      if (poster.complete && poster.naturalWidth === 0) showFallback();
+    }
+    button?.addEventListener('click', () => {
+      const iframe = document.createElement('iframe');
+      iframe.src = container.dataset.embedUrl || '';
+      iframe.title = button.getAttribute('aria-label') || 'Media player';
+      // The iframe is created only after a click, so delaying its load would delay playback.
+      iframe.loading = 'eager';
+      iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+      iframe.allowFullscreen = true;
+      container.replaceChildren(iframe);
+    }, { once: true });
+  });
+</script>

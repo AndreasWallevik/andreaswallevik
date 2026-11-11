@@ -1,0 +1,14 @@
+---
+import { site, withBase } from '../config/site';
+---
+<section class="contact-callout shell" aria-labelledby="contact-heading">
+  <p class="eyebrow">A conversation starts here</p>
+  <div class="callout-row">
+    <h2 id="contact-heading">Have something<br /><em>in mind?</em></h2>
+    <div>
+      <p>For music, sound, film or an idea that crosses between them, I’d be glad to hear from you.</p>
+      <a class="text-link" href={`mailto:${site.email}`}>Get in touch <span aria-hidden="true">↗</span></a>
+      <a class="visually-hidden" href={withBase('/contact/')}>Contact details</a>
+    </div>
+  </div>
+</section>

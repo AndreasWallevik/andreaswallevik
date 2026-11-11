@@ -1,0 +1,46 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import ContactCallout from '../components/ContactCallout.astro';
+import { listedProjects, selectedWork } from '../lib/projects';
+import { withBase } from '../config/site';
+
+const selected = await selectedWork();
+const projects = (await listedProjects()).filter((project) => !project.data.featured);
+---
+<BaseLayout>
+  <section class="hero shell">
+    <div class="hero-topline"><span>Independent music & creative work</span><span>Based in Tønsberg, Norway</span></div>
+    <h1>Andreas<br /><span>Wallevik<span class="hero-period">.</span></span></h1>
+    <div class="hero-bottomline">
+      <p>Music producer, songwriter<br />& multidisciplinary creative.</p>
+      <a class="round-arrow" href="#selected-work" aria-label="Explore selected work">↓</a>
+    </div>
+  </section>
+
+  <section class="intro-strip shell" aria-label="Introduction">
+    <p class="eyebrow">01 / An introduction</p>
+    <p>I write and produce music, and work with sound and image. Here are selected pieces of work and a few independent projects that shape my practice.</p>
+  </section>
+
+  <section id="selected-work" class="selected-work shell" aria-labelledby="selected-heading">
+    <div class="section-heading">
+      <div><p class="eyebrow">02 / Portfolio</p><h2 id="selected-heading">Selected <em>work</em></h2></div>
+      <a class="text-link" href={withBase('/work/')}>View all work <span aria-hidden="true">↗</span></a>
+    </div>
+    <div class="credit-grid">{selected.map((project, index) => <ProjectCard project={project} index={index} variant="feature" />)}</div>
+  </section>
+
+  <section class="projects-section shell" aria-labelledby="projects-heading">
+    <div class="section-heading">
+      <div><p class="eyebrow">03 / Projects</p><h2 id="projects-heading"><em>Projects</em></h2></div>
+    </div>
+    <div class="projects-grid">{projects.map((project, index) => <ProjectCard project={project} index={index} variant="compact" />)}</div>
+  </section>
+
+  <section class="about-teaser shell" aria-labelledby="about-heading">
+    <div><p class="eyebrow">04 / The person behind the work</p><h2 id="about-heading">A little about <em>me.</em></h2></div>
+    <div class="about-teaser-copy"><p>Originally from Hardanger and now based in Tønsberg, I work between songwriting, production, sound and visual storytelling.</p><a class="text-link" href={withBase('/about/')}>Read my story <span aria-hidden="true">↗</span></a></div>
+  </section>
+  <ContactCallout />
+</BaseLayout>

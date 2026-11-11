@@ -1,0 +1,54 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ContactCallout from '../../components/ContactCallout.astro';
+import MediaEmbed from '../../components/MediaEmbed.astro';
+import ProjectImage from '../../components/ProjectImage.astro';
+import MusicPlayer from '../../components/MusicPlayer.astro';
+import { categoryLabels } from '../../lib/projects';
+import { withBase } from '../../config/site';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects', ({ data }) => !data.draft && data.detail);
+  return projects.map((project) => ({ params: { slug: project.id }, props: { project } }));
+}
+
+interface Props { project: CollectionEntry<'projects'>; }
+const { project } = Astro.props;
+const { Content } = await render(project);
+const cover = project.data.cover;
+const coverAlt = project.data.coverAlt || '';
+const allProjects = await getCollection('projects', ({ data }) => !data.draft);
+const relatedProjects = allProjects.filter((entry) => project.data.relatedTo.includes(entry.id));
+const relatedVisualWork = allProjects.filter((entry) => entry.data.showInVisualWork && entry.data.relatedTo.includes(project.id));
+const hasSidebar = project.data.roles.length > 0 || project.data.collaborators.length > 0 || project.data.credits.length > 0 || Boolean(project.data.releaseDate) || project.data.links.length > 0 || Boolean(project.data.video) || relatedProjects.length > 0 || relatedVisualWork.length > 0;
+const subtitle = project.data.artistOrClient || project.data.subtitle;
+const sectionLabel = project.data.featured ? 'Selected work' : project.data.showInVisualWork ? 'Visual work' : 'Project';
+---
+<BaseLayout title={`${project.data.title} — Andreas Wallevik`} description={project.data.description} image={cover}>
+  <article class="detail-page">
+    <div class="detail-back shell"><a href={withBase('/work/')}><span aria-hidden="true">←</span> All work</a></div>
+    <header class="detail-heading shell">
+      <div><p class="eyebrow">{sectionLabel} / {project.data.categories.map((category) => categoryLabels[category]).join(' / ')}{project.data.year ? ` · ${project.data.year}` : ''}</p><h1>{project.data.title}<span class="accent-period">.</span></h1>{subtitle && !project.data.collaborators.includes(subtitle) && <p class="detail-subtitle">{subtitle}</p>}{project.data.status && <p class="detail-status">{project.data.status}</p>}</div>
+      {project.data.description && <p class="detail-lede">{project.data.description}</p>}
+    </header>
+    {project.data.video
+      ? <div class="detail-video shell"><MediaEmbed provider={project.data.video.provider} id={project.data.video.id} label={project.data.title} poster={cover} watchUrl={project.data.video.url} embed={project.data.video.embed} /></div>
+      : cover && <div class="detail-cover shell"><ProjectImage src={cover} alt={coverAlt} loading="eager" /></div>}
+    <div class:list={['detail-body', 'shell', { 'detail-body--simple': !hasSidebar }]}>
+      {hasSidebar && <div class="detail-sidebar">
+        {project.data.roles.length > 0 && <div><h2 class="eyebrow">Andreas’s work</h2><ul>{project.data.roles.map((role) => <li>{role}</li>)}</ul></div>}
+        {project.data.collaborators.length > 0 && <div><h2 class="eyebrow">Collaborators</h2><ul>{project.data.collaborators.map((person) => <li>{person}</li>)}</ul></div>}
+        {project.data.credits.length > 0 && <div><h2 class="eyebrow">Credits</h2><ul class="detail-credits">{project.data.credits.map((credit) => <li><span class="detail-credit-role">{credit.role}</span><span>{credit.names.join(', ')}</span></li>)}</ul></div>}
+        {project.data.releaseDate && <div><h2 class="eyebrow">Released</h2><p>{project.data.releaseDate.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' })}</p></div>}
+        {project.data.links.length > 0 && <div><h2 class="eyebrow">Explore</h2><ul>{project.data.links.map((link) => <li><a class="text-link" href={link.url} target="_blank" rel="noopener noreferrer">{link.label} <span aria-hidden="true">↗</span></a></li>)}</ul></div>}
+        {relatedProjects.length > 0 && <div><h2 class="eyebrow">Related project</h2><ul>{relatedProjects.map((entry) => <li><a class="text-link" href={entry.data.detail ? withBase(`/work/${entry.id}/`) : withBase(`/work/#project-${entry.id}-compact`)}>{entry.data.title} <span aria-hidden="true">↗</span></a></li>)}</ul></div>}
+        {relatedVisualWork.length > 0 && <div><h2 class="eyebrow">Related visual work</h2><ul>{relatedVisualWork.map((entry) => <li><a class="text-link" href={entry.data.detail ? withBase(`/work/${entry.id}/`) : withBase(`/work/#visual-${entry.id}`)}>{entry.data.title} <span aria-hidden="true">↗</span></a></li>)}</ul></div>}
+      </div>}
+      <div class="detail-main"><div class="prose"><Content /></div>{project.data.player && <MusicPlayer id={`player-${project.id}-detail`} title={project.data.title} player={project.data.player} />}</div>
+    </div>
+    {project.data.gallery.length > 0 && <section class="gallery shell" aria-label="Project gallery">{project.data.gallery.map((image) => <img src={withBase(image.src)} alt={image.alt} loading="lazy" />)}</section>}
+    {project.data.embeds.length > 0 && <section class="project-media shell" aria-labelledby="media-heading"><h2 id="media-heading">Watch & listen</h2><div class="media-grid">{project.data.embeds.map((embed) => <MediaEmbed {...embed} />)}</div></section>}
+  </article>
+  <ContactCallout />
+</BaseLayout>

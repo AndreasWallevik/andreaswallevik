@@ -1,0 +1,38 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import VisualWorkCard from '../../components/VisualWorkCard.astro';
+import ContactCallout from '../../components/ContactCallout.astro';
+import { listedProjects, selectedWork, visualWork } from '../../lib/projects';
+
+const selected = await selectedWork();
+const projects = await listedProjects();
+const visuals = await visualWork();
+---
+<BaseLayout title="Work — Andreas Wallevik" description="Selected music, sound, film and creative projects by Andreas Wallevik.">
+  <section class="page-intro shell">
+    <p class="eyebrow">Portfolio / Selected work</p>
+    <h1>Work<span class="accent-period">.</span></h1>
+    <p>A focused selection of music production and creative work, alongside independent projects.</p>
+  </section>
+  <section class="work-section shell" aria-labelledby="credits-heading">
+    <div class="section-heading">
+      <div><p class="eyebrow">01 / Portfolio</p><h2 id="credits-heading">Selected <em>work</em></h2></div>
+    </div>
+    <div class="credit-grid">{selected.map((project, index) => <ProjectCard project={project} index={index} variant="feature" />)}</div>
+  </section>
+  <section class="projects-section shell" aria-labelledby="projects-heading">
+    <div class="section-heading">
+      <div><p class="eyebrow">02 / Projects</p><h2 id="projects-heading"><em>Projects</em></h2></div>
+    </div>
+    <div class="projects-grid">{projects.map((project, index) => <ProjectCard project={project} index={index} variant="compact" />)}</div>
+  </section>
+  <section id="visual-work" class="visual-work-section shell" aria-labelledby="visual-heading">
+    <div class="section-heading">
+      <div><p class="eyebrow">03 / Visual work</p><h2 id="visual-heading">Visual <em>work</em></h2></div>
+    </div>
+    <p class="visual-work-intro">Music videos, visual pieces, and selected work for film.</p>
+    <div class="visual-grid">{visuals.map((project) => <VisualWorkCard project={project} />)}</div>
+  </section>
+  <ContactCallout />
+</BaseLayout>

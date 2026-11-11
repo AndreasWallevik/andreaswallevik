@@ -1,0 +1,11 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../config/site';
+---
+<BaseLayout title="Contact — Andreas Wallevik" description="Contact Andreas Wallevik about music production, songwriting, sound and creative collaborations.">
+  <section class="contact-page shell">
+    <p class="eyebrow">Contact / Start a conversation</p>
+    <h1>Let’s make<br /><em>something.</em></h1>
+    <div class="contact-page-bottom"><p>For collaborations, commissions or just a conversation about a project, email me directly.</p><a href={`mailto:${site.email}`} class="contact-address">{site.email} <span aria-hidden="true">↗</span></a></div>
+  </section>
+</BaseLayout>

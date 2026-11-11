@@ -1,0 +1,18 @@
+---
+import type { Project } from '../lib/projects';
+import { withBase } from '../config/site';
+import MediaEmbed from './MediaEmbed.astro';
+
+interface Props { project: Project; }
+const { project } = Astro.props;
+const video = project.data.video!;
+const roleLabel = project.data.roles.length > 0 ? project.data.roles.join(' / ') : project.data.description || 'Visual piece';
+---
+<article id={`visual-${project.id}`} class="visual-card">
+  <MediaEmbed provider={video.provider} id={video.id} label={project.data.title} poster={project.data.cover} watchUrl={video.url} embed={video.embed} />
+  <div class="visual-card-info">
+    <p class="eyebrow">{project.data.artistOrClient || 'Visual work'}</p>
+    <h3>{project.data.detail ? <a href={withBase(`/work/${project.id}/`)}>{project.data.title}</a> : project.data.title}</h3>
+    <p class="visual-card-role">{roleLabel}</p>
+  </div>
+</article>

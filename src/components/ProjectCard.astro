@@ -1,0 +1,32 @@
+---
+import type { Project } from '../lib/projects';
+import { withBase } from '../config/site';
+import ProjectImage from './ProjectImage.astro';
+import MusicPlayer from './MusicPlayer.astro';
+
+interface Props { project: Project; index?: number; variant?: 'feature' | 'compact'; }
+const { project, index = 0, variant = 'compact' } = Astro.props;
+const href = withBase(`/work/${project.id}/`);
+const cover = project.data.cover;
+const coverAlt = project.data.coverAlt || '';
+const identity = project.data.subtitle || project.data.artistOrClient || 'Project';
+---
+<article id={`project-${project.id}-${variant}`} class:list={['project-card', `project-card--${variant}`]}>
+  {project.data.detail
+    ? <a class="project-image-link" href={href} aria-label={`View ${project.data.title}`}>
+        {cover ? <ProjectImage src={cover} alt={coverAlt} loading={index > 0 ? 'lazy' : 'eager'} /> : <span class="project-image-fallback">{project.data.title}</span>}
+        <span class="image-arrow" aria-hidden="true">↗</span>
+      </a>
+    : <div class="project-image-link is-static">{cover ? <ProjectImage src={cover} alt={coverAlt} loading="lazy" /> : <span class="project-image-fallback">{project.data.title}</span>}</div>}
+  <div class="project-card-meta">
+    <p class="eyebrow">{identity}{project.data.year ? ` · ${project.data.year}` : ''}</p>
+    <h3>{project.data.detail ? <a href={href}>{project.data.title}</a> : project.data.title}</h3>
+    {project.data.roles.length > 0 && <p class="project-contribution">{project.data.roles.join(' / ')}</p>}
+    {project.data.description && <p class="project-description">{project.data.description}</p>}
+    {project.data.status && <p class="project-status">{project.data.status}</p>}
+    {(project.data.player || project.data.links.length > 0) && <div class="project-actions">
+      {project.data.player && <MusicPlayer id={`player-${project.id}-${variant}`} title={project.data.title} player={project.data.player} />}
+      {project.data.links.length > 0 && <div class="project-links">{project.data.links.map((link) => <a class="text-link project-external" href={link.url} target="_blank" rel="noopener noreferrer">{link.label} <span aria-hidden="true">↗</span></a>)}</div>}
+    </div>}
+  </div>
+</article>

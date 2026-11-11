@@ -1,0 +1,77 @@
+---
+import { musicPlayerHeight, type MusicProvider } from '../lib/music-player';
+
+interface Props {
+  id: string;
+  title: string;
+  player: { provider: MusicProvider; embedUrl: string };
+}
+
+const { id, title, player } = Astro.props;
+const height = musicPlayerHeight(player.provider, player.embedUrl);
+---
+<div
+  class="music-player"
+  data-music-player
+  data-embed-url={player.embedUrl}
+  data-embed-title={`${title} — ${player.provider === 'spotify' ? 'Spotify' : 'SoundCloud'} player`}
+  data-embed-height={height}
+>
+  <button type="button" class="music-player-toggle" aria-expanded="false" aria-controls={id}>
+    <span class="music-player-toggle-main"><span class="music-player-toggle-play" aria-hidden="true">▶</span><span class="music-player-toggle-label">Listen</span></span>
+    <span class="music-player-toggle-side"><span>{player.provider}</span><span class="music-player-toggle-icon" aria-hidden="true">⌄</span></span>
+  </button>
+  <div id={id} class="music-player-panel" aria-hidden="true" inert>
+    <div class="music-player-panel-inner"></div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-music-player]').forEach((root) => {
+    const button = root.querySelector<HTMLButtonElement>('.music-player-toggle');
+    const label = root.querySelector<HTMLElement>('.music-player-toggle-label');
+    const playIcon = root.querySelector<HTMLElement>('.music-player-toggle-play');
+    const panel = root.querySelector<HTMLElement>('.music-player-panel');
+    const inner = root.querySelector<HTMLElement>('.music-player-panel-inner');
+    if (!button || !label || !playIcon || !panel || !inner) return;
+
+    const duration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 360;
+    let expanded = false;
+    let cleanupTimer: ReturnType<typeof setTimeout> | undefined;
+
+    button.addEventListener('click', () => {
+      if (cleanupTimer) clearTimeout(cleanupTimer);
+
+      if (!expanded) {
+        expanded = true;
+        const iframe = document.createElement('iframe');
+        iframe.className = 'music-player-frame';
+        iframe.src = root.dataset.embedUrl || '';
+        iframe.title = root.dataset.embedTitle || 'Music player';
+        iframe.loading = 'lazy';
+        iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
+        iframe.allowFullscreen = true;
+        iframe.style.height = `${root.dataset.embedHeight || '352'}px`;
+        inner.replaceChildren(iframe);
+        panel.inert = false;
+        panel.setAttribute('aria-hidden', 'false');
+        button.setAttribute('aria-expanded', 'true');
+        label.textContent = 'Close player';
+        playIcon.textContent = '×';
+        requestAnimationFrame(() => { if (expanded) panel.classList.add('is-open'); });
+      } else {
+        expanded = false;
+        button.setAttribute('aria-expanded', 'false');
+        label.textContent = 'Listen';
+        playIcon.textContent = '▶';
+        panel.inert = true;
+        panel.setAttribute('aria-hidden', 'true');
+        const placeholder = document.createElement('div');
+        placeholder.style.height = `${root.dataset.embedHeight || '352'}px`;
+        inner.replaceChildren(placeholder);
+        panel.classList.remove('is-open');
+        cleanupTimer = setTimeout(() => { if (!expanded) inner.replaceChildren(); }, duration);
+      }
+    });
+  });
+</script>
