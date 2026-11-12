@@ -5,8 +5,8 @@ const site = process.env.SITE_URL || 'https://example.com';
 const base = process.env.BASE_PATH || '/';
 
 export default defineConfig({
-  site,
-  base,
+  site: 'https://andreaswallevik.no',
+  base: '/',
   output: 'static',
   integrations: [sitemap()],
   vite: {
@@ -17,3 +17,4 @@ export default defineConfig({
     },
   },
 });
+
