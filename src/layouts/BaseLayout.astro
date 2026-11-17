@@ -15,9 +15,10 @@ interface Props {
   title?: string;
   description?: string;
   image?: string | ImageMetadata;
+  noindex?: boolean;
 }
 
-const { title = site.title, description = site.description, image } = Astro.props;
+const { title = site.title, description = site.description, image, noindex = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site).toString();
 const imagePath = image
   ? typeof image === 'string' ? withBase(image) : (await getImage({ src: image, format: 'webp' })).src
@@ -36,6 +37,7 @@ const nav = [
     <meta name="theme-color" content="#f2efe8" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
     <link rel="canonical" href={canonical} />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />

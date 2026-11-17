@@ -1,0 +1,30 @@
+---
+interface Props {
+  embedUrl: string;
+  title: string;
+}
+
+const { embedUrl, title } = Astro.props;
+---
+<div class="samply-player">
+  <iframe
+    src={embedUrl}
+    title={`${title} — Samply audio player`}
+    width="100%"
+    height="560"
+    loading="eager"
+    allow="autoplay; encrypted-media"
+    referrerpolicy="strict-origin-when-cross-origin"
+  ></iframe>
+</div>
+<a class="samply-open" href={embedUrl} target="_blank" rel="noopener noreferrer" aria-label={`Open ${title} on Samply in a new tab`}>Open on Samply <span aria-hidden="true">↗</span></a>
+
+<style>
+  .samply-player { height: clamp(26rem, calc(100svh - 19rem), 34rem); }
+  .samply-player iframe { display: block; width: 100%; height: 100%; border: 1px solid var(--line); border-radius: 12px; background: var(--deep); }
+  .samply-open { display: inline-block; margin-top: .8rem; color: var(--muted); font-size: .78rem; font-weight: 700; text-decoration: underline; text-underline-offset: .2em; }
+  .samply-open:hover, .samply-open:focus-visible { color: var(--accent); }
+  @media (max-width: 640px) {
+    .samply-player { height: clamp(28rem, calc(100svh - 20rem), 34rem); }
+  }
+</style>

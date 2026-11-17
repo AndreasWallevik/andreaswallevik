@@ -1,0 +1,45 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { listeningNotice, listeningPlaylists } from '../../config/listening';
+import { withBase } from '../../config/site';
+
+const playlists = Object.values(listeningPlaylists);
+---
+<BaseLayout title="Selected Listening — Andreas Wallevik" description="Selected productions and compositions shared for professional evaluation." noindex>
+  <section class="listen-overview shell">
+    <p class="eyebrow">Andreas Wallevik / Selected works</p>
+    <h1>Listen<span class="accent-period">.</span></h1>
+    <p class="listen-overview-intro">Choose a listening selection.</p>
+
+    <div class="listen-choices">
+      {playlists.map((playlist) => <a class="listen-choice" href={withBase(`/listen/${playlist.slug}/`)}>
+        <h2>{playlist.title}</h2>
+        <p>{playlist.overviewDescription}</p>
+        <span aria-hidden="true">↗</span>
+      </a>)}
+    </div>
+
+    <p class="listen-overview-notice">{listeningNotice}</p>
+  </section>
+</BaseLayout>
+
+<style>
+  .listen-overview { padding-block: clamp(5rem, 10vw, 9rem) 8rem; }
+  .listen-overview h1 { margin: 2rem 0 1.5rem; font-size: clamp(5rem, 11vw, 11rem); font-weight: 500; line-height: .9; letter-spacing: -.09em; }
+  .listen-overview-intro { margin: 0 0 4rem; font-size: clamp(1.15rem, 2vw, 1.65rem); line-height: 1.45; letter-spacing: -.03em; }
+  .listen-choice { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .85fr) auto; align-items: center; gap: 2rem; padding: 2rem 0; border-top: 1px solid var(--line); }
+  .listen-choice:last-child { border-bottom: 1px solid var(--line); }
+  .listen-choice h2 { margin: 0; font-size: clamp(2rem, 4vw, 4rem); font-weight: 500; line-height: 1.1; letter-spacing: -.065em; }
+  .listen-choice p { max-width: 420px; margin: 0; color: var(--muted); font-size: 1rem; line-height: 1.5; }
+  .listen-choice > span { font-size: 1.5rem; }
+  .listen-choice:hover h2, .listen-choice:focus-visible h2 { color: var(--accent); }
+  .listen-overview-notice { max-width: 700px; margin: 2rem 0 0; color: var(--muted); font-size: .88rem; line-height: 1.55; }
+  @media (max-width: 640px) {
+    .listen-overview { padding-block: 5rem 5rem; }
+    .listen-overview h1 { font-size: clamp(4.6rem, 12vw, 6.5rem); }
+    .listen-overview-intro { margin-bottom: 3rem; }
+    .listen-choice { grid-template-columns: minmax(0, 1fr) auto; gap: .6rem 1rem; }
+    .listen-choice p { grid-column: 1; grid-row: 2; }
+    .listen-choice > span { grid-column: 2; grid-row: 1; }
+  }
+</style>

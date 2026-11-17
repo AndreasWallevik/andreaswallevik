@@ -8,7 +8,7 @@ export default defineConfig({
   site: 'https://andreaswallevik.no',
   base: '/',
   output: 'static',
-  integrations: [sitemap()],
+  integrations: [sitemap({ filter: (page) => !/^\/listen(?:\/|$)/.test(new URL(page).pathname) })],
   vite: {
     server: {
       watch: {
