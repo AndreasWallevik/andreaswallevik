@@ -38,6 +38,14 @@ em { font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; }
 .site-header nav a { color: var(--muted); font-size: .78rem; font-weight: 600; transition: color .2s ease; }
 .site-header nav a:hover, .site-header nav a[aria-current="page"] { color: var(--ink); }
 .site-header nav a[aria-current="page"] { text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: .5rem; }
+.work-nav { position: relative; }
+.work-nav-row { display: flex; align-items: center; gap: .2rem; }
+.work-nav-toggle { display: grid; place-items: center; width: 1.45rem; height: 1.7rem; padding: 0; border: 0; background: transparent; color: var(--muted); cursor: pointer; }
+.work-nav-toggle span { display: block; margin-top: -.3rem; font-size: 1.3rem; line-height: 1; transition: transform .2s ease; }
+.work-nav-toggle[aria-expanded="true"] span { transform: rotate(180deg); }
+.work-nav-toggle:hover, .work-nav-toggle:focus-visible { color: var(--ink); }
+.work-submenu { position: absolute; top: calc(100% + .65rem); left: -.75rem; z-index: 20; min-width: 7.5rem; padding: .45rem .75rem; border: 1px solid var(--line); background: var(--paper); }
+.work-submenu a { display: block; padding: .5rem 0; }
 
 .hero { padding-top: clamp(5rem, 10vw, 10rem); padding-bottom: 5.5rem; }
 .hero-topline { display: flex; justify-content: space-between; gap: 1rem; color: var(--muted); font-size: .72rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
@@ -112,8 +120,13 @@ em { font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; }
 .page-intro { padding: clamp(5rem, 10vw, 9rem) 0 5rem; border-bottom: 1px solid var(--line); }
 .page-intro h1 { max-width: 1100px; margin: 2rem 0 1.6rem; font-size: clamp(5rem, 11vw, 11rem); font-weight: 500; line-height: .9; letter-spacing: -.09em; }
 .page-intro > p:last-child { max-width: 630px; margin: 0; font-size: clamp(1.15rem, 2vw, 1.65rem); line-height: 1.45; letter-spacing: -.03em; }
+.work-paths { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2rem; padding-block: 2.4rem; border-bottom: 1px solid var(--line); }
+.work-paths a { display: flex; flex-direction: column; align-items: flex-start; gap: .6rem; min-width: 0; }
+.work-paths a > span:last-child { font-size: clamp(1.25rem, 2.2vw, 2rem); letter-spacing: -.045em; }
+.work-paths a:hover > span:last-child { color: var(--accent); }
 .work-section { padding-block: 5rem 8rem; }
 .visual-work-section { border-top: 1px solid var(--line); padding-block: 5rem 8rem; }
+.visual-work-section--standalone { border-top: 0; }
 .visual-work-intro { max-width: 550px; margin: 0 0 2.5rem; color: var(--muted); font-size: 1rem; line-height: 1.55; }
 .visual-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3.5rem 2rem; }
 .visual-card { min-width: 0; }
@@ -193,8 +206,16 @@ em { font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; }
 }
 @media (max-width: 640px) {
   .site-header { align-items: start; flex-direction: column; justify-content: center; gap: 1.2rem; padding-block: 1.2rem; }
-  .site-header nav { width: 100%; justify-content: space-between; gap: .5rem; }
+  .site-header nav { display: grid; width: 100%; grid-template-columns: repeat(4, max-content); justify-content: space-between; gap: .5rem; }
   .site-header nav a { font-size: .75rem; }
+  .site-header nav > a:first-child { grid-column: 1; grid-row: 1; }
+  .site-header nav > a:nth-of-type(2) { grid-column: 3; grid-row: 1; }
+  .site-header nav > a:nth-of-type(3) { grid-column: 4; grid-row: 1; }
+  .work-nav { display: contents; }
+  .work-nav-row { grid-column: 2; grid-row: 1; }
+  .work-submenu { position: static; grid-column: 1 / -1; grid-row: 2; display: flex; gap: 1.6rem; min-width: 0; padding: .5rem 0 0; border: 0; border-top: 1px solid var(--line); }
+  .work-submenu a { padding: .2rem 0; }
+  .work-paths { grid-template-columns: 1fr; gap: 1.6rem; }
   .hero-topline span:last-child { display: none; }
   .hero { padding-top: 5rem; padding-bottom: 4rem; }
   .hero h1 { margin-block: 3rem 2.5rem; font-size: clamp(3.65rem, 12.5vw, 6rem); }

@@ -2,6 +2,10 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 
 export type Project = CollectionEntry<'projects'>;
 
+export function isSoundWork(project: Project) {
+  return project.data.categories.some((category) => category === 'music' || category === 'sound-for-visuals');
+}
+
 export async function publishedProjects() {
   const projects = await getCollection('projects', ({ data }) => !data.draft);
   return projects.sort((a, b) =>

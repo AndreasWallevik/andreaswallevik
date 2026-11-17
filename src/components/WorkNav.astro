@@ -1,0 +1,41 @@
+---
+import { withBase } from '../config/site';
+
+const path = Astro.url.pathname;
+---
+<div class="work-nav" data-work-nav>
+  <div class="work-nav-row">
+    <a href={withBase('/work/')} aria-current={path === withBase('/work/') ? 'page' : undefined}>Work</a>
+    <button type="button" class="work-nav-toggle" aria-label="Toggle Work submenu" aria-expanded="false" aria-controls="work-submenu" data-work-toggle>
+      <span aria-hidden="true">⌄</span>
+    </button>
+  </div>
+  <div id="work-submenu" class="work-submenu" data-work-submenu hidden>
+    <a href={withBase('/work/sound/')} aria-current={path === withBase('/work/sound/') ? 'page' : undefined}>Sound</a>
+    <a href={withBase('/work/visual/')} aria-current={path === withBase('/work/visual/') ? 'page' : undefined}>Visual</a>
+  </div>
+</div>
+
+<script>
+  const workNav = document.querySelector<HTMLElement>('[data-work-nav]');
+  const toggle = workNav?.querySelector<HTMLButtonElement>('[data-work-toggle]');
+  const submenu = workNav?.querySelector<HTMLElement>('[data-work-submenu]');
+
+  if (workNav && toggle && submenu) {
+    const setOpen = (open: boolean) => {
+      submenu.hidden = !open;
+      toggle.setAttribute('aria-expanded', String(open));
+    };
+
+    toggle.addEventListener('click', () => setOpen(submenu.hidden));
+    document.addEventListener('pointerdown', (event) => {
+      if (!workNav.contains(event.target as Node)) setOpen(false);
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !submenu.hidden) {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+  }
+</script>

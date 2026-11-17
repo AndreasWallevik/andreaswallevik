@@ -9,6 +9,7 @@ import '../styles/global.css';
 import { getImage } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import { site, withBase } from '../config/site';
+import WorkNav from '../components/WorkNav.astro';
 
 interface Props {
   title?: string;
@@ -23,8 +24,6 @@ const imagePath = image
   : undefined;
 const ogImage = imagePath ? new URL(imagePath, Astro.site).toString() : undefined;
 const nav = [
-  { label: 'Home', href: withBase('/') },
-  { label: 'Work', href: withBase('/work/') },
   { label: 'About', href: withBase('/about/') },
   { label: 'Contact', href: withBase('/contact/') },
 ];
@@ -50,6 +49,8 @@ const nav = [
     <header class="site-header shell">
       <a class="wordmark" href={withBase('/')} aria-label="Andreas Wallevik, home">AW<span class="wordmark-dot">.</span></a>
       <nav aria-label="Main navigation">
+        <a href={withBase('/')} aria-current={Astro.url.pathname === withBase('/') ? 'page' : undefined}>Home</a>
+        <WorkNav />
         {nav.map((item) => <a href={item.href} aria-current={Astro.url.pathname === item.href ? 'page' : undefined}>{item.label}</a>)}
       </nav>
     </header>

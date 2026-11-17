@@ -1,0 +1,21 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import VisualWorkCard from '../../components/VisualWorkCard.astro';
+import ContactCallout from '../../components/ContactCallout.astro';
+import { visualWork } from '../../lib/projects';
+import { withBase } from '../../config/site';
+
+const visuals = await visualWork();
+---
+<BaseLayout title="Visual — Andreas Wallevik" description="Music videos, film, and visual productions by Andreas Wallevik.">
+  <section class="page-intro shell">
+    <p class="eyebrow"><a href={withBase('/work/')}>Work</a> / Visual</p>
+    <h1>Visual<span class="accent-period">.</span></h1>
+    <p>Music videos, visual pieces, and selected work for film.</p>
+  </section>
+  <section class="visual-work-section visual-work-section--standalone shell" aria-labelledby="visual-heading">
+    <div class="section-heading"><div><p class="eyebrow">Visual portfolio</p><h2 id="visual-heading">Selected <em>visuals</em></h2></div></div>
+    <div class="visual-grid">{visuals.map((project) => <VisualWorkCard project={project} />)}</div>
+  </section>
+  <ContactCallout />
+</BaseLayout>
