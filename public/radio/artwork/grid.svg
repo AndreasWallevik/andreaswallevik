@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-label="Abstract green grid and circles">
+  <rect width="600" height="600" fill="#19251f"/>
+  <path d="M100 0v600m100-600v600m100-600v600m100-600v600m100-600v600M0 100h600M0 200h600M0 300h600M0 400h600M0 500h600" stroke="#566e5d" stroke-width="2"/>
+  <circle cx="300" cy="300" r="224" fill="none" stroke="#d1df8e" stroke-width="3"/>
+  <circle cx="300" cy="300" r="150" fill="none" stroke="#d1df8e" stroke-width="3"/>
+  <circle cx="300" cy="300" r="75" fill="#bd6a44"/>
+</svg>

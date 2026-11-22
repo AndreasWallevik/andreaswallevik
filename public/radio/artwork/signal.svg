@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-label="Orange starburst on dark green">
+  <rect width="600" height="600" fill="#1b2620"/>
+  <g fill="none" stroke="#bd6a44" stroke-width="2" opacity=".55">
+    <circle cx="300" cy="300" r="210"/><circle cx="300" cy="300" r="160"/><circle cx="300" cy="300" r="110"/>
+  </g>
+  <path d="M300 70 328 244 445 146 356 269 530 300 356 331 445 454 328 356 300 530 272 356 155 454 244 331 70 300 244 269 155 146 272 244Z" fill="#d1df8e"/>
+  <circle cx="300" cy="300" r="46" fill="#bd6a44"/>
+  <circle cx="300" cy="300" r="15" fill="#1b2620"/>
+</svg>

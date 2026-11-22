@@ -1,0 +1,122 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import RadioVisualizer from '../components/RadioVisualizer.astro';
+import { buildRadioManifest } from '../lib/radio-manifest.server';
+import { withBase } from '../config/site';
+
+const manifest = await buildRadioManifest();
+const radioChannels = manifest.channels;
+---
+
+<BaseLayout title="Radio — Andreas Wallevik" description="An experimental internet radio for music discovery." noindex>
+  <section class="radio-page shell" data-radio data-radio-manifest={JSON.stringify(manifest)} data-schedule-version={manifest.version}>
+    <div class="radio-topline">
+      <h1 class="eyebrow">Independent radio / Prototype 001</h1>
+      <span>EST. SOMEWHERE ONLINE</span>
+    </div>
+
+    <div class="radio-console">
+      <div class="radio-console-top">
+        <span>01 / TUNE IN</span>
+        <span class="radio-indicator"><i aria-hidden="true"></i> SHARED SIGNAL</span>
+      </div>
+
+      <div class="radio-stations" role="group" aria-label="Choose a radio channel">
+        {Object.entries(radioChannels).map(([id, channel], index) =>
+          <button type="button" data-channel={id} aria-pressed={index === 0 ? 'true' : 'false'}>
+            <span class="radio-station-number">0{index + 1}</span>
+            <span>{channel.name}</span>
+            <span aria-hidden="true">↗</span>
+          </button>
+        )}
+      </div>
+
+      <div class="radio-player">
+        <RadioVisualizer initialArtworkSrc={withBase('/radio/artwork/signal.svg')} />
+
+        <div class="radio-player-info">
+          <p class="radio-kicker">NOW PLAYING <span aria-hidden="true">✳</span></p>
+          <h2 data-track-title>Finding the signal…</h2>
+          <p class="radio-track-artist" data-track-artist hidden></p>
+          <p class="radio-art-credit" data-art-credit hidden></p>
+
+          <div class="radio-controls">
+            <button type="button" class="radio-play" data-play-toggle aria-label="Play Radio">
+              <span data-play-icon aria-hidden="true">▶</span><span data-play-label>Play</span>
+            </button>
+            <div class="radio-control-copy">
+              <span data-status aria-live="polite">PAUSED · THE STATION KEEPS MOVING</span>
+              <p data-channel-description>{radioChannels.radio.description}</p>
+            </div>
+          </div>
+          <progress data-progress value="0" max="6" aria-label="Progress of the current track"></progress>
+          <p class="radio-footnote">No skips. Join wherever the station is now.</p>
+        </div>
+      </div>
+
+      <audio preload="none" crossorigin="anonymous"></audio>
+      <noscript><p class="radio-noscript">Enable JavaScript to tune in.</p></noscript>
+    </div>
+
+    <div class="radio-bottomline">
+      <p>WORK IN PROGRESS / CURATED AUDIO, ALWAYS IN MOTION.</p>
+      <p>TUNE IN AT ANY TIME.</p>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import { initRadioPlayer } from '../lib/radio-player';
+  initRadioPlayer();
+</script>
+
+<style>
+  .radio-page { padding-block: clamp(1.25rem, 2vw, 2rem) 7rem; }
+  .radio-topline, .radio-bottomline { display: flex; justify-content: space-between; gap: 1rem; color: var(--muted); font-size: .7rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+  .radio-topline { margin-bottom: clamp(1rem, 2vw, 1.5rem); padding-bottom: 1rem; border-bottom: 1px solid var(--line); }
+  .radio-topline > span { text-align: right; }
+  .radio-console { padding: clamp(1.25rem, 3vw, 2.5rem); background: var(--deep); color: var(--paper); border-radius: 4px; }
+  .radio-console-top { display: flex; justify-content: space-between; gap: 1rem; padding-bottom: 1.25rem; color: #bdc9b9; font-size: .7rem; font-weight: 700; letter-spacing: .15em; }
+  .radio-indicator { display: inline-flex; align-items: center; gap: .6rem; }
+  .radio-indicator i { width: .5rem; height: .5rem; border-radius: 50%; background: #d1df8e; box-shadow: 0 0 12px #d1df8e; }
+  .radio-stations { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; padding-bottom: 1.5rem; }
+  .radio-stations button { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 1rem; min-width: 0; padding: 1rem 1.25rem; border: 1px solid #66746b; background: transparent; color: var(--paper); text-align: left; cursor: pointer; font-size: clamp(1rem, 1.7vw, 1.5rem); font-weight: 600; letter-spacing: -.04em; }
+  .radio-stations button[aria-pressed="true"] { border-color: #d1df8e; background: #d1df8e; color: var(--deep); }
+  .radio-stations button:hover:not([aria-pressed="true"]) { border-color: var(--paper); }
+  .radio-station-number { align-self: start; font-size: .65rem; letter-spacing: .08em; }
+  .radio-player { display: grid; grid-template-columns: minmax(220px, .82fr) minmax(0, 1fr); gap: clamp(1.5rem, 4vw, 4rem); align-items: stretch; padding-top: 1.5rem; border-top: 1px solid #66746b; }
+  .radio-player-info { display: flex; flex-direction: column; min-width: 0; }
+  .radio-kicker { display: flex; justify-content: space-between; margin: 0 0 clamp(1.5rem, 4vw, 4rem); color: #d1df8e; font-size: .72rem; font-weight: 700; letter-spacing: .15em; }
+  .radio-kicker span { font-size: 1.8rem; line-height: .4; }
+  .radio-player-info h2 { margin: 0; font-size: clamp(2.4rem, 5vw, 5.5rem); font-weight: 500; line-height: .95; letter-spacing: -.07em; overflow-wrap: anywhere; }
+  .radio-track-artist { margin: .9rem 0 0; color: #bcc8bc; font-size: clamp(1rem, 1.5vw, 1.2rem); }
+  .radio-art-credit { margin: .5rem 0 0; color: #bcc8bc; font-size: .75rem; }
+  .radio-controls { display: flex; align-items: center; gap: 1.25rem; margin-top: auto; padding-top: 2rem; }
+  .radio-play { display: inline-flex; align-items: center; justify-content: center; gap: .85rem; min-width: 116px; min-height: 52px; padding: .7rem 1.1rem; border: 0; background: var(--paper); color: var(--deep); cursor: pointer; font-size: .9rem; font-weight: 700; }
+  .radio-play:hover { background: #d1df8e; }
+  .radio-play [data-play-icon] { font-size: .85rem; }
+  .radio-control-copy { min-width: 0; }
+  .radio-control-copy > span { color: #d1df8e; font-size: .67rem; font-weight: 700; letter-spacing: .1em; }
+  .radio-control-copy p { margin: .35rem 0 0; color: #bcc8bc; font-size: .82rem; line-height: 1.4; }
+  .radio-player-info progress { width: 100%; height: .35rem; margin-top: 1.5rem; border: 0; background: #66746b; accent-color: #d1df8e; }
+  .radio-player-info progress::-webkit-progress-bar { background: #66746b; }
+  .radio-player-info progress::-webkit-progress-value { background: #d1df8e; }
+  .radio-player-info progress::-moz-progress-bar { background: #d1df8e; }
+  .radio-footnote { margin: .75rem 0 0; color: #bcc8bc; font-size: .75rem; }
+  .radio-noscript { margin: 1rem 0 0; }
+  .radio-bottomline { padding-top: 1.2rem; }
+  .radio-bottomline p { margin: 0; }
+  @media (max-width: 760px) {
+    .radio-page { padding-bottom: 4rem; }
+    .radio-player { grid-template-columns: 1fr; }
+    .radio-kicker { margin-bottom: 1.5rem; }
+    .radio-controls { padding-top: 2rem; }
+  }
+  @media (max-width: 520px) {
+    .radio-stations { gap: .5rem; }
+    .radio-stations button { gap: .4rem; padding: .75rem; font-size: .95rem; }
+    .radio-station-number { font-size: .55rem; }
+    .radio-topline > span, .radio-bottomline p:last-child { display: none; }
+    .radio-controls { align-items: start; flex-direction: column; gap: .9rem; }
+  }
+</style>

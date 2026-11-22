@@ -13,6 +13,18 @@ npm run dev
 
 Open the local URL Astro prints. Run `npm run check` and `npm run build` before publishing. `npm run preview` serves the built site.
 
+## Radio prototype
+
+`/radio/` is an unlisted, noindex experiment. It has no server or database. At build time, `src/lib/radio-manifest.server.ts` scans MP3 and WAV files directly in `public/radio/audio/` for **Radio** and `public/radio/audio/beats/` for **Beat Station**. Files are sorted by filename, then their title, artist and duration are read from audio metadata. If tags are missing, `Artist - Title.mp3` supplies both names; otherwise the filename becomes the title and the artist line is omitted. A missing duration stops the build with an instruction to add an override. Other file types or unexpected folders in the public audio directories also stop the build, to avoid publishing unrelated files.
+
+To add a song, export an MP3 to the correct folder, then commit and push it with the site when ready to publish. Prefer embedded title and artist tags. New files need no manual playlist entry. The four short generated WAV test sounds can be recreated with `node scripts/generate-radio-demo-audio.mjs`; remove them when they are no longer wanted. `src/config/radio.ts` holds optional overrides keyed by path relative to `public/radio/audio/`. Use an override for artwork, corrected title or artist, `durationSeconds` when a file has no readable duration, or `playbackDurationSeconds` to give a song a shorter radio slot. Songs without an artwork override use `radioArtworkPool`; both artwork types can include an artist credit.
+
+The player in `src/lib/radio-player.ts` uses a fixed time anchor and the generated track durations to choose approximately the same position for listeners on the same published version whose device clocks agree. The static page embeds a versioned snapshot of its playlist; an open tab keeps its snapshot when a new deploy adds tracks. New visitors use the new snapshot. Builds with unchanged audio and metadata do not restart the schedule. Old and new versions can briefly play different songs; keep removed audio files available until old tabs have refreshed if uninterrupted playback matters. Playback starts only after a visitor presses Play. Switching stations is allowed; there is no skip control. Browsers may pause audio in the background, and the player resynchronizes when the page becomes visible again.
+
+The radio's optional visualizer lives in `src/components/RadioVisualizer.astro` and `src/lib/radio-visualizer.ts`. Cover artwork is shown by default; visitors can enable Oscilloscope, Psychedelic or Artwork reactive mode. It uses one Web Audio `MediaElementAudioSourceNode` and one `AnalyserNode` for the existing audio element, even as tracks change. The animation stops when paused, hidden or switched off, and stays off for visitors who prefer reduced motion. External audio hosts such as R2 must allow CORS from the site origin for Web Audio analysis; the `<audio>` element requests media with `crossorigin="anonymous"`.
+
+GitHub Pages can host this static prototype, but substantial audio libraries should be served from dedicated object storage rather than committed to Git. Reactions, guestbook, Drive sync and Cloudflare services are intentionally outside this prototype.
+
 Check YouTube and Vimeo playback in a regular browser window. VS Code's embedded browser can restrict video playback even when the same local page works in Edge. If automated browser testing needs a separate profile, create it under the operating system's temporary directory, outside this repository.
 
 ## Add or edit a project

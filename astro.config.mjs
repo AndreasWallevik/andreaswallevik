@@ -8,11 +8,11 @@ export default defineConfig({
   site: 'https://andreaswallevik.no',
   base: '/',
   output: 'static',
-  integrations: [sitemap({ filter: (page) => !/^\/listen(?:\/|$)/.test(new URL(page).pathname) })],
+  integrations: [sitemap({ filter: (page) => !/^\/(?:listen|radio)(?:\/|$)/.test(new URL(page).pathname) })],
   vite: {
     server: {
       watch: {
-        ignored: ['**/.tmp-*/**'],
+        ignored: ['**/.tmp-*/**', '**/.radio-private/**'],
       },
     },
   },
