@@ -1,11 +1,13 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import RadioVisualizer from '../components/RadioVisualizer.astro';
+import RadioSocial from '../components/RadioSocial.astro';
 import { buildRadioManifest } from '../lib/radio-manifest.server';
 import { withBase } from '../config/site';
 
 const manifest = await buildRadioManifest();
 const radioChannels = manifest.channels;
+const apiUrl = import.meta.env.PUBLIC_RADIO_API_URL?.trim().replace(/\/$/, '') || (import.meta.env.DEV ? 'http://127.0.0.1:8787' : '');
 ---
 
 <BaseLayout title="Radio — Andreas Wallevik" description="An experimental internet radio for music discovery." noindex>
@@ -58,6 +60,8 @@ const radioChannels = manifest.channels;
       <noscript><p class="radio-noscript">Enable JavaScript to tune in.</p></noscript>
     </div>
 
+    <RadioSocial apiUrl={apiUrl} />
+
     <div class="radio-bottomline">
       <p>WORK IN PROGRESS / CURATED AUDIO, ALWAYS IN MOTION.</p>
       <p>TUNE IN AT ANY TIME.</p>
@@ -67,6 +71,8 @@ const radioChannels = manifest.channels;
 
 <script>
   import { initRadioPlayer } from '../lib/radio-player';
+  import { initRadioSocial } from '../lib/radio-social';
+  initRadioSocial();
   initRadioPlayer();
 </script>
 

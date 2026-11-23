@@ -39,6 +39,8 @@ jobs:
             echo "BASE_PATH=/${GITHUB_REPOSITORY#*/}" >> "$GITHUB_ENV"
           fi
       - name: Build static site
+        env:
+          PUBLIC_RADIO_API_URL: ${{ vars.PUBLIC_RADIO_API_URL }}
         run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:

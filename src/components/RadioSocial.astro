@@ -1,0 +1,81 @@
+---
+interface Props { apiUrl: string }
+const { apiUrl } = Astro.props;
+const available = Boolean(apiUrl);
+const reactions = [
+  { id: 'fire', emoji: '🔥', label: 'Fire' },
+  { id: 'heart', emoji: '❤️', label: 'Heart' },
+  { id: 'eyes', emoji: '👀', label: 'Eyes' },
+  { id: 'melt', emoji: '🫠', label: 'Melting face' },
+];
+---
+
+<div class="radio-social" data-radio-social data-api-url={apiUrl}>
+  <section class="reactions" aria-labelledby="reactions-heading">
+    <p class="eyebrow">02 / Leave a signal</p>
+    <h2 id="reactions-heading">Reactions</h2>
+    <p class="social-intro">For <strong data-reaction-track>the current track</strong>. Choose one, change it, or tap again to remove it.</p>
+    <div class="reaction-buttons" role="group" aria-label="React to the current track">
+      {reactions.map(({ id, emoji, label }) =>
+        <button type="button" data-reaction={id} aria-pressed="false" aria-label={available ? `${label} reaction, 0` : `${label} reaction unavailable`} disabled>
+          <span aria-hidden="true">{emoji}</span><span data-count>{available ? '0' : '–'}</span>
+        </button>
+      )}
+    </div>
+    <p class="social-status" data-reaction-status role="status" aria-live="polite">{available ? 'Connecting to reactions…' : 'Reactions are not connected yet.'}</p>
+  </section>
+
+  <section class="guestbook" aria-labelledby="guestbook-heading">
+    <p class="eyebrow">03 / From the dial-up days</p>
+    <h2 id="guestbook-heading">Guestbook</h2>
+    <form data-guestbook-form>
+      <label for="guestbook-name">Name <span>(optional)</span></label>
+      <input id="guestbook-name" name="name" maxlength="30" autocomplete="nickname" placeholder="Anonymous" disabled />
+      <label for="guestbook-message">Message</label>
+      <textarea id="guestbook-message" name="message" maxlength="280" rows="3" required placeholder="Leave a note…" disabled></textarea>
+      <div class="guestbook-honeypot" aria-hidden="true"><label for="guestbook-website">Website</label><input id="guestbook-website" name="website" tabindex="-1" autocomplete="off" /></div>
+      <div class="guestbook-actions"><button type="submit" disabled>Sign guestbook ↗</button><span>280 characters max.</span></div>
+    </form>
+    <p class="social-status" data-guestbook-status role="status" aria-live="polite">{available ? 'Connecting to guestbook…' : 'Guestbook is not connected yet.'}</p>
+    <div class="guestbook-list-heading"><h3>Latest notes</h3><button type="button" data-guestbook-refresh disabled={!available}>Refresh</button></div>
+    <ul class="guestbook-list" data-guestbook-list>{!available && <li>Messages will appear when the guestbook is online.</li>}</ul>
+  </section>
+</div>
+
+<style>
+  .radio-social { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(2rem, 5vw, 5rem); padding-block: 3rem 1.5rem; }
+  .radio-social section { min-width: 0; }
+  .radio-social h2 { margin: .7rem 0 1rem; font-size: clamp(2.4rem, 4vw, 4rem); font-weight: 500; letter-spacing: -.065em; line-height: 1; }
+  .social-intro { max-width: 31rem; margin: 0 0 1.5rem; color: var(--muted); font-size: .9rem; line-height: 1.55; }
+  .social-intro strong { color: var(--ink); font-weight: 600; }
+  .reaction-buttons { display: flex; flex-wrap: wrap; gap: .65rem; }
+  .reaction-buttons button { display: inline-flex; align-items: center; gap: .65rem; min-height: 3rem; padding: .55rem .85rem; border: 1px solid var(--line); background: transparent; color: var(--ink); cursor: pointer; font: inherit; font-size: .9rem; }
+  .reaction-buttons button span:first-child { font-size: 1.3rem; }
+  .reaction-buttons button:hover, .reaction-buttons button[aria-pressed="true"] { border-color: var(--deep); background: var(--deep); color: var(--paper); }
+  .reaction-buttons button:disabled { opacity: .55; cursor: wait; }
+  .social-status { min-height: 1.3rem; margin: .8rem 0 0; color: var(--muted); font-size: .78rem; line-height: 1.4; }
+  .guestbook form { display: grid; gap: .45rem; }
+  .guestbook label { font-size: .77rem; font-weight: 700; }
+  .guestbook label span { color: var(--muted); font-weight: 400; }
+  .guestbook input, .guestbook textarea { width: 100%; min-width: 0; padding: .75rem .85rem; border: 1px solid var(--line); border-radius: 0; background: transparent; color: var(--ink); font: inherit; font-size: .9rem; }
+  .guestbook input:disabled, .guestbook textarea:disabled { opacity: .55; }
+  .guestbook textarea { resize: vertical; }
+  .guestbook label:not(:first-child) { margin-top: .65rem; }
+  .guestbook-honeypot { position: absolute; left: -10000px; }
+  .guestbook-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .8rem; margin-top: .7rem; }
+  .guestbook-actions button { padding: .75rem 1rem; border: 0; background: var(--deep); color: var(--paper); cursor: pointer; font: inherit; font-size: .82rem; font-weight: 700; }
+  .guestbook-actions button:hover { background: var(--accent); }
+  .guestbook-actions button:disabled { opacity: .6; cursor: wait; }
+  .guestbook-actions span { color: var(--muted); font-size: .72rem; }
+  .guestbook-list-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-top: 1.3rem; border-top: 1px solid var(--line); }
+  .guestbook-list-heading h3 { margin: 1rem 0; font-size: .82rem; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; }
+  .guestbook-list-heading button { padding: .4rem 0; border: 0; background: transparent; color: var(--muted); cursor: pointer; font: inherit; font-size: .75rem; text-decoration: underline; }
+  .guestbook-list-heading button:disabled { opacity: .5; cursor: default; }
+  .guestbook-list { list-style: none; margin: 0; padding: 0; }
+  .guestbook-list :global(li) { padding: .9rem 0; border-top: 1px solid var(--line); }
+  .guestbook-list :global(li:first-child) { border-top: 0; }
+  .guestbook-list :global(p) { margin: .4rem 0 0; font-size: .88rem; line-height: 1.5; overflow-wrap: anywhere; white-space: pre-wrap; }
+  .guestbook-list :global(.guestbook-meta) { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .5rem; font-size: .72rem; }
+  .guestbook-list :global(time) { color: var(--muted); }
+  @media (max-width: 760px) { .radio-social { grid-template-columns: 1fr; padding-top: 2rem; } }
+</style>

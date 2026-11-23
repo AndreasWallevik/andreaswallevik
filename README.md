@@ -15,7 +15,7 @@ Open the local URL Astro prints. Run `npm run check` and `npm run build` before 
 
 ## Radio prototype
 
-`/radio/` is an unlisted, noindex experiment. It has no server or database. At build time, `src/lib/radio-manifest.server.ts` scans MP3 and WAV files directly in `public/radio/audio/` for **Radio** and `public/radio/audio/beats/` for **Beat Station**. Files are sorted by filename, then their title, artist and duration are read from audio metadata. If tags are missing, `Artist - Title.mp3` supplies both names; otherwise the filename becomes the title and the artist line is omitted. A missing duration stops the build with an instruction to add an override. Other file types or unexpected folders in the public audio directories also stop the build, to avoid publishing unrelated files.
+`/radio/` is a noindex experiment linked from the homepage. Audio playback is static and needs no streaming server. At build time, `src/lib/radio-manifest.server.ts` scans MP3 and WAV files directly in `public/radio/audio/` for **Radio** and `public/radio/audio/beats/` for **Beat Station**. Files are sorted by filename, then their title, artist and duration are read from audio metadata. If tags are missing, `Artist - Title.mp3` supplies both names; otherwise the filename becomes the title and the artist line is omitted. A missing duration stops the build with an instruction to add an override. Other file types or unexpected folders in the public audio directories also stop the build, to avoid publishing unrelated files.
 
 To add a song, export an MP3 to the correct folder, then commit and push it with the site when ready to publish. Prefer embedded title and artist tags. New files need no manual playlist entry. The four short generated WAV test sounds can be recreated with `node scripts/generate-radio-demo-audio.mjs`; remove them when they are no longer wanted. `src/config/radio.ts` holds optional overrides keyed by path relative to `public/radio/audio/`. Use an override for artwork, corrected title or artist, `durationSeconds` when a file has no readable duration, or `playbackDurationSeconds` to give a song a shorter radio slot. Songs without an artwork override use `radioArtworkPool`; both artwork types can include an artist credit.
 
@@ -23,7 +23,30 @@ The player in `src/lib/radio-player.ts` uses a fixed time anchor and the generat
 
 The radio's optional visualizer lives in `src/components/RadioVisualizer.astro` and `src/lib/radio-visualizer.ts`. Cover artwork is shown by default; visitors can enable Oscilloscope, Psychedelic or Artwork reactive mode. It uses one Web Audio `MediaElementAudioSourceNode` and one `AnalyserNode` for the existing audio element, even as tracks change. The animation stops when paused, hidden or switched off, and stays off for visitors who prefer reduced motion. External audio hosts such as R2 must allow CORS from the site origin for Web Audio analysis; the `<audio>` element requests media with `crossorigin="anonymous"`.
 
-GitHub Pages can host this static prototype, but substantial audio libraries should be served from dedicated object storage rather than committed to Git. Reactions, guestbook, Drive sync and Cloudflare services are intentionally outside this prototype.
+GitHub Pages can host this static prototype, but substantial audio libraries should be served from dedicated object storage rather than committed to Git. Drive sync and Cloudflare audio storage are outside this prototype.
+
+### Radio reactions and guestbook
+
+The homepage links to `/radio/`. The radio page always shows the reactions and guestbook sections. Without an API URL, their controls are disabled with an explanation. In local Astro development, the page defaults to `http://127.0.0.1:8787`; production uses `PUBLIC_RADIO_API_URL` set during the build. The API is a separate Cloudflare Worker in `worker/`, backed by one D1 database. The site and its DNS can stay on GitHub Pages; the browser calls the Worker's `workers.dev` URL. No Cloudflare resources are created by this repository or its GitHub Actions workflow.
+
+Reactions use the existing path-based track IDs, so reordering the playlist does not reset counts. Renaming or moving an audio file changes its ID and starts new counts. Each browser stores a random token per track in local storage; D1 has one row per track and token, so refreshing or repeating a request does not add another reaction. Clearing browser storage or using another browser creates a new token. Counts refresh on track changes, when the tab becomes visible and every 30 seconds while visible.
+
+The guestbook accepts an optional name (30 characters) and a message (280 characters). Its latest 30 entries are returned newest first. It normalizes text and strips control characters; the browser renders it with `textContent`, never HTML. A hidden form field catches simple bots. D1 rate limiting allows at most five guestbook posts per day and one per minute from the same Cloudflare-provided IP, plus 100 reaction changes per day. The Worker stores only a daily HMAC of that IP, not the raw address; buckets older than seven days are removed on a later write. This limits casual abuse but cannot stop someone who changes IP address or browser storage. No account or email is requested.
+
+**Local setup** (two terminals):
+
+1. Run `npm ci` and `npm run radio:api:migrate:local`.
+2. Create ignored `worker/.dev.vars` containing `RATE_LIMIT_SECRET=` followed by a random value of at least 32 characters. Run `npm run radio:api:dev` (port 8787).
+3. Run `npm run dev` (port 4321) in another terminal. The local API URL is automatic; use an ignored `.env` with `PUBLIC_RADIO_API_URL=...` only if your Worker runs elsewhere. Run `npm run radio:api:test` against the local Worker when needed.
+
+**Cloudflare setup, when explicitly approved:**
+
+1. Sign in with `npx wrangler login`, then create a free D1 database with `npx wrangler d1 create andreas-radio-social`. Replace the all-zero local placeholder `database_id` in `worker/wrangler.jsonc` with the returned ID. Check `ALLOWED_ORIGINS` before deployment.
+2. Apply `npx wrangler d1 migrations apply andreas-radio-social --remote --config worker/wrangler.jsonc` and deploy with `npx wrangler deploy --config worker/wrangler.jsonc`.
+3. Set a long random secret with `npx wrangler secret put RATE_LIMIT_SECRET --config worker/wrangler.jsonc`. Never put this secret in `.env`, GitHub variables, or frontend code.
+4. Add the deployed `https://...workers.dev` URL (without a trailing slash) as the GitHub repository variable `PUBLIC_RADIO_API_URL`, then rebuild the Astro site. The Pages workflow passes this variable to `npm run build`. Until this variable is set, the public radio keeps playing and displays disabled social controls.
+
+To remove an unwanted guestbook entry, note its numeric `id` from `GET /api/guestbook`, then run `npx wrangler d1 execute andreas-radio-social --remote --config worker/wrangler.jsonc --command "DELETE FROM guestbook WHERE id = 123"` with the correct ID. There is no public admin endpoint or browser-held admin secret. Cloudflare's [Workers limits](https://developers.cloudflare.com/workers/platform/limits/) and [D1 pricing](https://developers.cloudflare.com/d1/platform/pricing/) describe the current free allowances; check them before enabling the service.
 
 Check YouTube and Vimeo playback in a regular browser window. VS Code's embedded browser can restrict video playback even when the same local page works in Edge. If automated browser testing needs a separate profile, create it under the operating system's temporary directory, outside this repository.
 

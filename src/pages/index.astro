@@ -13,7 +13,10 @@ const projects = (await listedProjects()).filter((project) => !project.data.feat
     <div class="hero-topline"><span>Independent music & creative work</span><span>Based in Tønsberg, Norway</span></div>
     <h1>Andreas<br /><span>Wallevik<span class="hero-period">.</span></span></h1>
     <div class="hero-bottomline">
-      <p>Music producer, songwriter<br />& multidisciplinary creative.</p>
+      <div>
+        <p>Music producer, songwriter<br />& multidisciplinary creative.</p>
+        <a class="text-link hero-radio-link" href={withBase('/radio/')}>Listen to the radio <span aria-hidden="true">↗</span></a>
+      </div>
       <a class="round-arrow" href="#selected-work" aria-label="Explore selected work">↓</a>
     </div>
   </section>
@@ -44,3 +47,7 @@ const projects = (await listedProjects()).filter((project) => !project.data.feat
   </section>
   <ContactCallout />
 </BaseLayout>
+
+<style>
+  .hero-radio-link { margin-top: 1.3rem; }
+</style>

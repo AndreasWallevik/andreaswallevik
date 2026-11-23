@@ -5,3 +5,6 @@ dist/
 .DS_Store
 /.tmp-*/
 /.radio-private/
+/worker/.dev.vars*
+/.wrangler/
+/worker/.wrangler/

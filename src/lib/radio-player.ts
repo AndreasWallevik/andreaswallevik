@@ -60,6 +60,7 @@ export function initRadioPlayer() {
   let pendingOffset = 0;
   let playbackError: string | null = null;
   let playbackRequest = 0;
+  let currentTrackId: string | null = null;
 
   const setStatus = (message: string) => { status.textContent = message; };
   const updateToggle = () => {
@@ -113,6 +114,10 @@ export function initRadioPlayer() {
 
     if (wantsPlayback) startAudio(onAir);
     setStatus(playbackError ?? (wantsPlayback ? 'ON AIR · SHARED SIGNAL' : 'PAUSED · THE STATION KEEPS MOVING'));
+    if (currentTrackId !== onAir.track.id) {
+      currentTrackId = onAir.track.id;
+      root?.dispatchEvent(new CustomEvent('radio:trackchange', { detail: { id: onAir.track.id, title: onAir.track.title } }));
+    }
   }
 
   audio.addEventListener('loadedmetadata', () => {
